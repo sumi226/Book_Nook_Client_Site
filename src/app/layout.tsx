@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" data-theme="booknook">
-      <body className="min-h-screen bg-[#000080] font-sans text-white antialiased">
+      <body className="min-h-screen bg-[#faf6f0] font-sans text-[#00022E] antialiased">
         <div className="flex min-h-screen flex-col">
           <Navbar />
           <main className="mx-auto w-full max-w-7xl flex-1 px-5 py-8 sm:px-8 sm:py-12">{children}</main>

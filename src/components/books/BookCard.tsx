@@ -28,7 +28,7 @@ export default function BookCard({ book }: { book: Book }) {
         <div className="p-5">
           <h3 className="line-clamp-1 font-serif text-xl font-bold">{book.title}</h3>
           <p className="mt-1 text-sm text-slate-600">by {book.author}</p>
-          <p className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-[#60452e]">
+          <p className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-[#A85335]">
             View Details <ArrowUpRight aria-hidden="true" size={16} />
           </p>
         </div>

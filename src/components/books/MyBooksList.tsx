@@ -38,6 +38,6 @@ export default function MyBooksList() {
   return <>
     {error && <p role="alert" className="mb-5 rounded-xl bg-red-950/50 p-4 text-red-100">{error}</p>}
     {notice && <p role="status" className="mb-5 rounded-xl bg-green-950/50 p-4 text-green-100">{notice}</p>}
-    {books.length ? <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{books.map((book) => <div key={book._id} className="space-y-3"><BookCard book={book} /><button className="btn btn-sm btn-outline border-white/50 text-white" onClick={() => removeBook(book)}>Remove book</button></div>)}</div> : !error && <div className="rounded-2xl border border-white/20 p-8 text-white/80">You haven’t added a book yet. <Link className="font-bold text-[#f0cda9] underline" href="/add-book">Add your first book.</Link></div>}
+    {books.length ? <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{books.map((book) => <div key={book._id} className="space-y-3"><BookCard book={book} /><button className="btn btn-sm btn-outline border-[#00022E]/30 text-[#00022E]" onClick={() => removeBook(book)}>Remove book</button></div>)}</div> : !error && <div className="rounded-2xl border border-[#00022E]/15 bg-white p-8 text-[#514740]">You haven’t added a book yet. <Link className="font-bold text-[#A85335] underline" href="/add-book">Add your first book.</Link></div>}
   </>;
 }

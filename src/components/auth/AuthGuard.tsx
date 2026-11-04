@@ -17,7 +17,7 @@ export default function AuthGuard({ children }: { children: ReactNode }) {
   }, [isPending, pathname, router, session]);
 
   if (isPending || !session) {
-    return <div className="flex min-h-[45vh] items-center justify-center text-white"><LoaderCircle className="animate-spin" /> <span className="ml-3">Checking your library pass…</span></div>;
+    return <div className="flex min-h-[45vh] items-center justify-center text-[#00022E]"><LoaderCircle className="animate-spin" /> <span className="ml-3">Checking your library pass…</span></div>;
   }
   return children;
 }

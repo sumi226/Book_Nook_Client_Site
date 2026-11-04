@@ -39,11 +39,11 @@ export default function BookActions({ bookId, availableCopies }: { bookId: strin
           {[3, 5, 7, 10, 14].map((days) => <option key={days} value={days}>{days} days</option>)}
         </select>
       </label>}
-      <button className="btn border-0 bg-[#c2956b] text-[#16110d] hover:bg-[#ddb58e]" disabled={isPending || busy || availableCopies < 1} onClick={borrow}>
+      <button className="btn border-0 bg-[#C87958] text-[#00022E] hover:bg-[#da9578]" disabled={isPending || busy || availableCopies < 1} onClick={borrow}>
         {busy ? "Borrowing…" : availableCopies < 1 ? "Currently unavailable" : session ? "Borrow this book" : "Sign in to borrow"}
       </button>
-      {error && <p role="alert" className="text-sm font-semibold text-red-200">{error}</p>}
-      {success && <p role="status" className="text-sm font-semibold text-green-200">{success}</p>}
+      {error && <p role="alert" className="text-sm font-semibold text-red-700">{error}</p>}
+      {success && <p role="status" className="text-sm font-semibold text-green-700">{success}</p>}
     </div>
   );
 }

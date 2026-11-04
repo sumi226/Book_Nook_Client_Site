@@ -6,7 +6,7 @@ export default function Footer() {
     <footer className="bg-[#00022E] text-white">
       <div className="mx-auto grid max-w-7xl gap-10 px-6 py-12 sm:px-8 md:grid-cols-[1.4fr_1fr_1fr]">
         <div>
-          <Link href="/" className="inline-flex items-center gap-3 font-serif text-2xl font-bold"><BookOpen size={24} className="text-[#d3aa81]" />BookNook</Link>
+          <Link href="/" className="inline-flex items-center gap-3 font-serif text-2xl font-bold"><BookOpen size={24} className="text-[#C87958]" />BookNook</Link>
           <p className="mt-4 max-w-md text-sm leading-7 text-white/75">A friendly online library for curious readers. Discover a new favorite, share a well-loved book, and make room for a good story.</p>
         </div>
         <div>

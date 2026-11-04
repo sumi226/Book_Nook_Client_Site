@@ -44,7 +44,7 @@ export default function AddBookForm() {
       <label className="form-control gap-2"><span className="font-semibold">Description</span><textarea name="description" className="textarea textarea-bordered min-h-32 w-full" maxLength={5000} required /></label>
       <label className="form-control gap-2"><span className="font-semibold">Total copies</span><input name="totalCopies" type="number" className="input input-bordered w-full" min={1} max={100000} defaultValue={1} required /></label>
       {error && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-800">{error}</p>}
-      <button className="btn w-full border-0 bg-[#c2956b] text-[#16110d] hover:bg-[#ddb58e]" disabled={busy}>{busy ? "Saving book…" : "Add book to the library"}</button>
+      <button className="btn w-full border-0 bg-[#C87958] text-[#00022E] hover:bg-[#da9578]" disabled={busy}>{busy ? "Saving book…" : "Add book to the library"}</button>
     </form>
   );
 }

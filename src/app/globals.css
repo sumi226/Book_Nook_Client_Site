@@ -6,16 +6,16 @@
   name: "booknook";
   default: true;
   color-scheme: light;
-  --color-base-100: #ffffff;
-  --color-base-200: #f1f3f7;
-  --color-base-300: #dce1e8;
-  --color-base-content: #171923;
-  --color-primary: #c2956b;
-  --color-primary-content: #16110d;
+  --color-base-100: #faf6f0;
+  --color-base-200: #f1e9df;
+  --color-base-300: #e2d5c8;
+  --color-base-content: #00022e;
+  --color-primary: #c87958;
+  --color-primary-content: #00022e;
   --color-secondary: #00022e;
   --color-secondary-content: #ffffff;
-  --color-accent: #d8b08a;
-  --color-accent-content: #16110d;
+  --color-accent: #c87958;
+  --color-accent-content: #00022e;
   --color-neutral: #00022e;
   --color-neutral-content: #ffffff;
   --radius-selector: 0.75rem;
@@ -31,6 +31,13 @@
 }
 
 html { min-height: 100%; scroll-behavior: smooth; }
-body { min-height: 100vh; }
+body { min-height: 100vh; background: #faf6f0; color: #00022e; }
 button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
-::selection { color: #00022e; background: #e6c6a6; }
+::selection { color: #00022e; background: #e7a88e; }
+
+.booknook-carousel {
+  --swiper-navigation-color: #efb39c;
+  --swiper-pagination-color: #c87958;
+  --swiper-pagination-bullet-inactive-color: #ffffff;
+  --swiper-pagination-bullet-inactive-opacity: 0.65;
+}

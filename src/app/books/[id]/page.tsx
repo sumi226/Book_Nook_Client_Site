@@ -18,7 +18,7 @@ export default async function BookDetailsPage({ params }: { params: Promise<{ id
   }
 
   return <article className="mx-auto max-w-5xl">
-    <Link href="/books" className="mb-6 inline-flex items-center gap-2 font-semibold text-[#f0cda9] hover:underline"><ArrowLeft size={17} /> Back to all books</Link>
+    <Link href="/books" className="mb-6 inline-flex items-center gap-2 font-semibold text-[#A85335] hover:underline"><ArrowLeft size={17} /> Back to all books</Link>
     <div className="grid overflow-hidden rounded-3xl bg-white text-slate-900 shadow-2xl md:grid-cols-[.8fr_1.2fr]">
       <div className="relative min-h-80 bg-slate-100 md:min-h-[560px]"><Image src={book.image} alt={`Cover of ${book.title}`} fill unoptimized sizes="(max-width: 768px) 100vw, 40vw" className="object-cover" /></div>
       <div className="p-7 sm:p-10">

@@ -44,7 +44,7 @@ export default function Navbar() {
             </ul>
           </div>
           <Link href="/" className="flex items-center gap-2 rounded-lg font-serif text-2xl font-bold tracking-tight" aria-label="BookNook home">
-            <span className="grid size-10 place-items-center rounded-xl bg-[#c2956b] text-[#00022E]"><BookOpen size={22} /></span>
+            <span className="grid size-10 place-items-center rounded-xl bg-[#C87958] text-[#00022E]"><BookOpen size={22} /></span>
             BookNook
           </Link>
         </div>
@@ -57,7 +57,7 @@ export default function Navbar() {
         <div className="navbar-end gap-2">
           {!isPending && !user && <>
             <Link href="/login" className="btn btn-ghost btn-sm text-white">Login</Link>
-            <Link href="/register" className="btn btn-sm border-0 bg-[#c2956b] text-[#16110d] hover:bg-[#ddb58e]">Register</Link>
+            <Link href="/register" className="btn btn-sm border-0 bg-[#C87958] text-[#00022E] hover:bg-[#da9578]">Register</Link>
           </>}
           {user && <div className="dropdown dropdown-end">
             <button type="button" className="btn btn-ghost gap-2 rounded-full text-white" aria-label="Open account menu">

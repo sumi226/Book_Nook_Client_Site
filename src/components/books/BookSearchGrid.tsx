@@ -15,7 +15,7 @@ export default function BookSearchGrid({ books }: { books: Book[] }) {
     <>
       <label className="mb-7 block max-w-xl">
         <span className="sr-only">Search books by title, author, or category</span>
-        <input className="input input-lg w-full border-white/25 bg-white text-slate-900" placeholder="Search title, author, or category…" value={query} onChange={(event) => setQuery(event.target.value)} />
+        <input className="input input-lg w-full border-slate-300 bg-white text-slate-900" placeholder="Search title, author, or category…" value={query} onChange={(event) => setQuery(event.target.value)} />
       </label>
       <BookGrid books={filtered} />
     </>
