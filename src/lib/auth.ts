@@ -21,7 +21,7 @@ function getAuthBaseUrl() {
     ? configuredUrls.find((url) => !isLocalUrl(url))
     : configuredUrls.find(isLocalUrl);
 
-  return preferred || configuredUrls[0] || (
+  return preferred || (
     process.env.NODE_ENV === "production"
       ? "https://booknookclientsite.vercel.app"
       : "http://localhost:3000"

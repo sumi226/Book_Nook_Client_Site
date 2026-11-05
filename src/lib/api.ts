@@ -10,7 +10,7 @@ function selectEnvironmentUrl(value: string | undefined, fallback: string) {
     ? candidates.find((url) => !isLocalUrl(url))
     : candidates.find(isLocalUrl);
 
-  return preferred || candidates[0] || fallback;
+  return preferred || fallback;
 }
 
 const API_URL = selectEnvironmentUrl(
