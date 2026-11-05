@@ -28,15 +28,17 @@ async function getAccessToken() {
     credentials: "include",
     cache: "no-store",
   });
-  const payload = (await response.json().catch(() => ({}))) as {
-    token?: string;
-    message?: string;
-  };
+  const payload = (await response.json().catch(() => ({}))) as
+    | { token?: string; message?: string }
+    | string;
 
-  if (!response.ok || !payload.token) {
-    throw new Error(payload.message || "Please sign in again to continue.");
+  const token = typeof payload === "string" ? payload : payload?.token;
+
+  if (!response.ok || !token) {
+    const message = typeof payload === "object" ? payload?.message : undefined;
+    throw new Error(message || "Please sign in again to continue.");
   }
-  return payload.token;
+  return token;
 }
 
 export async function apiRequest<T>(

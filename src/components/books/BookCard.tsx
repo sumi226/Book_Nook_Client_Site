@@ -11,7 +11,7 @@ export default function BookCard({ book }: { book: Book }) {
         className="group block"
         aria-label={`View details for ${book.title}`}
       >
-        <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+        <div className="relative aspect-[2/3] overflow-hidden bg-slate-100">
           {/* External cover URLs are supplied by the existing catalog/API. */}
           <Image
             src={book.image}
@@ -19,7 +19,7 @@ export default function BookCard({ book }: { book: Book }) {
             fill
             unoptimized
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
           />
           <span className="absolute left-3 top-3 rounded-full bg-[#00022E]/90 px-3 py-1 text-xs font-semibold text-white">
             {book.category}

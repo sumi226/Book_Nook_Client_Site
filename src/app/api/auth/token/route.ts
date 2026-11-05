@@ -23,7 +23,8 @@ export async function GET() {
   }
 
   const token = await authServer.api.getToken({ headers: requestHeaders });
-  return Response.json(token, {
+  const payload = typeof token === "string" ? { token } : token;
+  return Response.json(payload, {
     headers: { "Cache-Control": "no-store" },
   });
 }

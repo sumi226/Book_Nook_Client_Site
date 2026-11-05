@@ -57,13 +57,19 @@ export default function AddBookForm({ book, onSaved }: AddBookFormProps) {
         throw new Error("Choose a cover image to upload.");
       }
 
+      const rawCopies = data.get("totalCopies");
+      const totalCopies = Number(rawCopies);
+      if (!Number.isInteger(totalCopies) || totalCopies < 1) {
+        throw new Error("Total Copies must be a valid number of at least 1.");
+      }
+
       const input = {
         title: String(data.get("title") || "").trim(),
         author: String(data.get("author") || "").trim(),
         category: String(data.get("category") || ""),
         image,
         description: String(data.get("description") || "").trim(),
-        totalCopies: Number(data.get("totalCopies")),
+        totalCopies,
       };
       const savedBook = book
         ? await updateBook(book._id, input)
@@ -92,7 +98,7 @@ export default function AddBookForm({ book, onSaved }: AddBookFormProps) {
       <label className="form-control gap-2"><span className="font-semibold">Category</span><select name="category" className="select select-bordered w-full" defaultValue={book?.category || ""} required><option value="" disabled>Choose a category</option>{categories.map((category) => <option key={category}>{category}</option>)}</select></label>
       <label className="form-control gap-2"><span className="font-semibold">Cover image</span><input name="imageFile" type="file" accept="image/*" className="file-input file-input-bordered w-full" required={!book} /><span className="text-sm text-slate-500">{book ? "Choose a new image to replace the current cover; leave empty to keep it." : "Your image will be uploaded securely to ImgBB."}</span>{book && <span className="break-all text-xs text-slate-500">Current cover: {book.image}</span>}</label>
       <label className="form-control gap-2"><span className="font-semibold">Description</span><textarea name="description" className="textarea textarea-bordered min-h-32 w-full" maxLength={5000} defaultValue={book?.description} required /></label>
-      <label className="form-control gap-2"><span className="font-semibold">Total copies</span><input name="totalCopies" type="number" className="input input-bordered w-full" min={1} max={100000} defaultValue={book?.totalCopies || 1} required /></label>
+      <label className="form-control gap-2"><span className="font-semibold">Total Copies</span><input name="totalCopies" type="number" className="input input-bordered w-full" min={1} max={100000} defaultValue={book?.totalCopies || 1} placeholder="e.g. 5" required /></label>
       {error && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-800">{error}</p>}
       <button className="btn w-full border-0 bg-[#C87958] text-[#00022E] hover:bg-[#da9578]" disabled={busy}>{busy ? "Uploading and saving…" : book ? "Save changes" : "Add book to the library"}</button>
     </form>

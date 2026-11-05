@@ -7,6 +7,7 @@ export interface Book {
   description: string;
   totalCopies: number;
   availableCopies: number;
+  copies?: number;
   addedByName?: string;
   addedByEmail?: string;
   ownerId?: string;
@@ -19,6 +20,9 @@ export interface Borrow {
   bookTitle: string;
   borrowedAt: string;
   dueAt?: string;
+  userId?: string;
+  userEmail?: string;
+  userName?: string;
 }
 
 export interface PageResult<T> {
