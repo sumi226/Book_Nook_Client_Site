@@ -17,7 +17,13 @@ export default function BookSearchGrid({ books }: { books: Book[] }) {
         <span className="sr-only">Search books by title, author, or category</span>
         <input className="input input-lg w-full border-slate-300 bg-white text-slate-900" placeholder="Search title, author, or category…" value={query} onChange={(event) => setQuery(event.target.value)} />
       </label>
-      <BookGrid books={filtered} />
+      {filtered.length === 0 && query.trim() ? (
+        <p className="rounded-2xl border border-dashed border-[#00022E]/25 bg-white/70 p-10 text-center text-[#514740]">
+          No books match “{query.trim()}”. Try another title, author, or category.
+        </p>
+      ) : (
+        <BookGrid books={filtered} />
+      )}
     </>
   );
 }

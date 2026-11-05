@@ -7,6 +7,13 @@ const API_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").rep
 
 type ApiOptions = RequestInit & { authenticated?: boolean };
 
+export class ApiError extends Error {
+  constructor(message: string, public readonly status: number) {
+    super(message);
+    this.name = "ApiError";
+  }
+}
+
 async function getAccessToken() {
   const response = await fetch("/api/auth/token", {
     credentials: "include",
@@ -33,7 +40,7 @@ export async function apiRequest<T>(
     headers.set("content-type", "application/json");
   }
   if (authenticated) {
-    headers.set("authorization", `Bearer ${await getAccessToken()}`);
+    headers.set("authorization", "Bearer " + (await getAccessToken()));
   }
 
   const response = await fetch(`${API_URL}${path}`, {
@@ -51,7 +58,7 @@ export async function apiRequest<T>(
         : `The request failed (${response.status}).`;
     const details =
       payload && Array.isArray(payload.details) ? ` ${payload.details.join(" ")}` : "";
-    throw new Error(`${message}${details}`);
+    throw new ApiError(`${message}${details}`, response.status);
   }
   return payload as T;
 }
@@ -65,7 +72,10 @@ export async function listBooks(page = 1, limit = 24) {
 }
 
 export async function getBook(id: string) {
-  return (await apiRequest<{ book: Book }>(`/books/${encodeURIComponent(id)}`)).book;
+  const result = await apiRequest<{ book: Book }>(
+    `/books/${encodeURIComponent(id)}`,
+  );
+  return result.book;
 }
 
 export async function createBook(input: {
