@@ -51,3 +51,13 @@ Set the following in `book_nook_server/.env`; values must correspond to the fron
 Authenticated frontend API calls obtain a JWT from the current Better Auth session and send it as a bearer token. Express validates the signature, expiry, issuer, and audience using the JWKS endpoint and reads the signed user identity claims. Do not copy the Better Auth session cookie or its secret into Express.
 
 For official configuration details, see Better Auth's [database concepts](https://www.better-auth.com/docs/concepts/database), [email/password](https://www.better-auth.com/docs/authentication/email-password), [hooks](https://www.better-auth.com/docs/concepts/hooks), [Google OAuth](https://www.better-auth.com/docs/concepts/oauth), and [JWT plugin](https://www.better-auth.com/docs/plugins/jwt).
+
+## Vercel deployment
+
+Deploy the frontend and Express API as separate Vercel projects:
+
+1. Set the frontend project's **Root Directory** to `booknook-client`. Add its production environment variables from the frontend table above. Set `BETTER_AUTH_URL` to `https://booknookclientsite.vercel.app` and set `NEXT_PUBLIC_API_URL` to the deployed API's HTTPS origin (without a trailing slash).
+2. Set the API project's **Root Directory** to `book_nook_server`. Its `vercel.json` exposes the Express API as a Vercel function. Add `MONGODB_URI` for the shared MongoDB database, and set `CLIENT_URL` to `https://booknookclientsite.vercel.app`. `DB_NAME` defaults to `booknook`; `BETTER_AUTH_ISSUER`, `BETTER_AUTH_AUDIENCE`, and `BETTER_AUTH_JWKS_URL` default to the frontend's auth origin and JWKS endpoint. Set them explicitly only if the Better Auth configuration uses different values.
+3. After setting environment variables, redeploy both projects. A frontend environment change takes effect only in a new build.
+
+Use the API project's assigned Vercel domain for `NEXT_PUBLIC_API_URL`; the frontend domain is not the API URL. Keep MongoDB and Better Auth secrets in Vercel's server-side environment variables, never in `NEXT_PUBLIC_` variables.

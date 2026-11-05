@@ -1,9 +1,18 @@
 import type { Book, Borrow, PageResult } from "@/types/book";
 
-const API_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(
-  /\/$/,
-  "",
-);
+const defaultApiUrl =
+  process.env.NODE_ENV === "production"
+    ? "https://booknookserversite.vercel.app"
+    : "http://localhost:8000";
+const configuredApiUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
+const configuredApiIsLocal =
+  configuredApiUrl !== undefined &&
+  /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/?$/i.test(configuredApiUrl);
+const API_URL = (
+  process.env.NODE_ENV === "production" && configuredApiIsLocal
+    ? defaultApiUrl
+    : configuredApiUrl || defaultApiUrl
+).replace(/\/$/, "");
 
 type ApiOptions = RequestInit & { authenticated?: boolean };
 
