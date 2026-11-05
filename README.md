@@ -1,4 +1,4 @@
- ****  BookNook – Online Book Sharing & Borrowing Platform ****
+ ****  BookNook – A Quieter corner for readers. ****
 
 BookNook is an online book platform where readers can discover books, explore new arrivals, share their favorite books, and borrow books from the community. It provides a convenient way for book lovers to connect and enjoy reading.
 

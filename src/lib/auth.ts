@@ -11,6 +11,23 @@ const globalForMongo = globalThis as typeof globalThis & {
   bookNookAuthMongo?: MongoClient;
 };
 
+function getAuthBaseUrl() {
+  const configuredUrls = (process.env.BETTER_AUTH_URL || "")
+    .split(",")
+    .map((url) => url.trim().replace(/\/+$/, ""))
+    .filter(Boolean);
+  const isLocalUrl = (url: string) => /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(url);
+  const preferred = process.env.NODE_ENV === "production"
+    ? configuredUrls.find((url) => !isLocalUrl(url))
+    : configuredUrls.find(isLocalUrl);
+
+  return preferred || configuredUrls[0] || (
+    process.env.NODE_ENV === "production"
+      ? "https://booknookclientsite.vercel.app"
+      : "http://localhost:3000"
+  );
+}
+
 export function createAuth() {
   const mongoUri = process.env.MONGODB_URI;
   if (!mongoUri) {
@@ -37,7 +54,7 @@ export function createAuth() {
   const database = mongoClient.db(process.env.DB_NAME || "booknook");
   return betterAuth({
     appName: "BookNook",
-    baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
+    baseURL: getAuthBaseUrl(),
     secret,
     database: mongodbAdapter(database, { client: mongoClient, transaction: false }),
     emailAndPassword: {

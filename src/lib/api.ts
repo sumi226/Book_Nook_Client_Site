@@ -1,18 +1,24 @@
 import type { Book, Borrow, PageResult } from "@/types/book";
 
-const defaultApiUrl =
+function selectEnvironmentUrl(value: string | undefined, fallback: string) {
+  const candidates = (value || "")
+    .split(",")
+    .map((url) => url.trim().replace(/\/+$/, ""))
+    .filter(Boolean);
+  const isLocalUrl = (url: string) => /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(url);
+  const preferred = process.env.NODE_ENV === "production"
+    ? candidates.find((url) => !isLocalUrl(url))
+    : candidates.find(isLocalUrl);
+
+  return preferred || candidates[0] || fallback;
+}
+
+const API_URL = selectEnvironmentUrl(
+  process.env.NEXT_PUBLIC_API_URL,
   process.env.NODE_ENV === "production"
     ? "https://booknookserversite.vercel.app"
-    : "http://localhost:8000";
-const configuredApiUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
-const configuredApiIsLocal =
-  configuredApiUrl !== undefined &&
-  /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/?$/i.test(configuredApiUrl);
-const API_URL = (
-  process.env.NODE_ENV === "production" && configuredApiIsLocal
-    ? defaultApiUrl
-    : configuredApiUrl || defaultApiUrl
-).replace(/\/$/, "");
+    : "http://localhost:8000",
+);
 
 type ApiOptions = RequestInit & { authenticated?: boolean };
 
