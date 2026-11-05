@@ -20,8 +20,11 @@ BookNook uses Better Auth in the Next.js app for email/password and Google sign-
 | `BETTER_AUTH_URL` | Yes | Public origin of the Next.js app, e.g. `http://localhost:3000`. |
 | `GOOGLE_CLIENT_ID` | For Google sign-in | Google OAuth 2.0 web client ID. |
 | `GOOGLE_CLIENT_SECRET` | For Google sign-in | Secret paired with the Google OAuth client ID. Keep it server-only. |
+| `NEXT_PUBLIC_IMGBB_API_KEY` | For book cover uploads | ImgBB API key used by the browser to upload cover images. |
 
 Set both Google variables to enable Google sign-in; leave both unset to use email/password only. Never prefix the Google client secret or Better Auth secret with `NEXT_PUBLIC_`.
+
+To enable cover uploads, create an API key in the [ImgBB API settings](https://api.imgbb.com/) and set `NEXT_PUBLIC_IMGBB_API_KEY` in `.env.local`. This key is necessarily available in the browser because uploads go directly from the form to ImgBB; restrict/monitor it through your ImgBB account and do not use it as an authentication secret. Restart Next.js after changing environment variables.
 
 ### Google OAuth configuration
 

@@ -95,6 +95,26 @@ export async function createBook(input: {
   ).book;
 }
 
+export async function updateBook(
+  bookId: string,
+  input: {
+    title: string;
+    author: string;
+    category: string;
+    image: string;
+    description: string;
+    totalCopies: number;
+  },
+) {
+  return (
+    await apiRequest<{ book: Book }>(`/books/${encodeURIComponent(bookId)}`, {
+      method: "PATCH",
+      authenticated: true,
+      body: JSON.stringify(input),
+    })
+  ).book;
+}
+
 export async function listMyBooks(page = 1, limit = 100) {
   const result = await apiRequest<{
     books: Book[];
