@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { authClient } from "@/lib/auth-client";
+import { getPasswordValidationError } from "@/lib/password-policy";
 
 export default function AuthForm({ mode, nextUrl }: { mode: "login" | "register"; nextUrl?: string }) {
   const [error, setError] = useState("");
@@ -18,6 +19,15 @@ export default function AuthForm({ mode, nextUrl }: { mode: "login" | "register"
     const formData = new FormData(event.currentTarget);
     const email = String(formData.get("email") || "").trim();
     const password = String(formData.get("password") || "");
+    if (registering) {
+      const passwordError = getPasswordValidationError(password);
+      if (passwordError) {
+        setError(passwordError);
+        setBusy(false);
+        return;
+      }
+    }
+
     try {
       const result = registering
         ? await authClient.signUp.email({
@@ -39,6 +49,24 @@ export default function AuthForm({ mode, nextUrl }: { mode: "login" | "register"
     }
   }
 
+  async function signInWithGoogle() {
+    setError("");
+    setBusy(true);
+    try {
+      const result = await authClient.signIn.social({
+        provider: "google",
+        callbackURL: nextUrl || "/",
+      });
+      if (result.error) {
+        setError(result.error.message || "Google sign-in failed. Please try again.");
+      }
+    } catch (issue) {
+      setError(issue instanceof Error ? issue.message : "Google sign-in failed.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <section className="mx-auto w-full max-w-lg rounded-3xl bg-white p-7 text-slate-900 shadow-2xl sm:p-10">
       <p className="text-sm font-bold uppercase tracking-[.2em] text-[#A85335]">Welcome to BookNook</p>
@@ -47,10 +75,13 @@ export default function AuthForm({ mode, nextUrl }: { mode: "login" | "register"
       <form className="mt-8 space-y-5" onSubmit={submit}>
         {registering && <label className="form-control gap-2"><span className="font-semibold">Name</span><input className="input input-bordered w-full" name="name" autoComplete="name" minLength={2} maxLength={100} required /></label>}
         <label className="form-control gap-2"><span className="font-semibold">Email</span><input className="input input-bordered w-full" name="email" type="email" autoComplete="email" required /></label>
-        <label className="form-control gap-2"><span className="font-semibold">Password</span><input className="input input-bordered w-full" name="password" type="password" autoComplete={registering ? "new-password" : "current-password"} minLength={8} required /></label>
+        <label className="form-control gap-2"><span className="font-semibold">Password</span><input className="input input-bordered w-full" name="password" type="password" autoComplete={registering ? "new-password" : "current-password"} minLength={registering ? 6 : undefined} required /></label>
+        {registering && <p className="-mt-3 text-sm text-slate-600">Use at least 6 characters, including an uppercase and a lowercase letter.</p>}
         {error && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-800">{error}</p>}
         <button type="submit" className="btn w-full border-0 bg-[#C87958] text-[#00022E] hover:bg-[#da9578]" disabled={busy}>{busy ? "Please wait…" : registering ? "Create account" : "Sign in"}</button>
       </form>
+      <div className="my-6 flex items-center gap-4 text-sm text-slate-500"><span className="h-px flex-1 bg-slate-200" />or<span className="h-px flex-1 bg-slate-200" /></div>
+      <button type="button" className="btn btn-outline w-full" onClick={signInWithGoogle} disabled={busy}>{busy ? "Please wait…" : "Continue with Google"}</button>
       <p className="mt-6 text-center text-sm text-slate-600">
         {registering ? "Already have an account? " : "New to BookNook? "}
         <Link className="font-bold text-[#A85335] underline" href={registering ? "/login" : "/register"}>{registering ? "Sign in" : "Create an account"}</Link>

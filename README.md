@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BookNook
 
-## Getting Started
+BookNook uses Better Auth in the Next.js app for email/password and Google sign-in, stores users and sessions in MongoDB, and issues JWTs for the Express API. Express validates those JWTs against Better Auth's JWKS endpoint; it does not implement a separate login system.
 
-First, run the development server:
+## Local setup
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+1. Install the frontend and API dependencies in their respective folders with `npm install`.
+2. Copy `booknook-client/.env.example` to `booknook-client/.env.local` and set the values below.
+3. Copy `book_nook_server/.env.example` to `book_nook_server/.env` and set its values. Both apps must connect to the same MongoDB database.
+4. Start MongoDB, then run `npm run dev` in `book_nook_server` and `npm run dev` in `booknook-client`.
+
+### Frontend environment
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `NEXT_PUBLIC_API_URL` | Yes | Express API origin, normally `http://localhost:8000`. |
+| `MONGODB_URI` | Yes | MongoDB connection string used by Better Auth. |
+| `DB_NAME` | Yes | Database name used by Better Auth (and preferably Express). |
+| `BETTER_AUTH_SECRET` | Yes | Random, private secret used by Better Auth to secure sessions. Use a unique value with at least 32 characters. |
+| `BETTER_AUTH_URL` | Yes | Public origin of the Next.js app, e.g. `http://localhost:3000`. |
+| `GOOGLE_CLIENT_ID` | For Google sign-in | Google OAuth 2.0 web client ID. |
+| `GOOGLE_CLIENT_SECRET` | For Google sign-in | Secret paired with the Google OAuth client ID. Keep it server-only. |
+
+Set both Google variables to enable Google sign-in; leave both unset to use email/password only. Never prefix the Google client secret or Better Auth secret with `NEXT_PUBLIC_`.
+
+### Google OAuth configuration
+
+In the Google Cloud Console, configure the OAuth consent screen and create an OAuth 2.0 Client ID of type **Web application**. Add the frontend origin (`http://localhost:3000`) under **Authorized JavaScript origins** and this callback under **Authorized redirect URIs**:
+
+```text
+http://localhost:3000/api/auth/callback/google
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Put the resulting client ID and client secret in the frontend `.env.local` as `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`, then restart Next.js. For deployment, use the deployed HTTPS origin and its matching `/api/auth/callback/google` URI, and configure the same `BETTER_AUTH_URL`. Add production and preview origins only when needed. While the OAuth consent screen is in testing mode, add the Google accounts that should be allowed to sign in as test users.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Express JWT verification
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Set the following in `book_nook_server/.env`; values must correspond to the frontend Better Auth configuration:
 
-## Learn More
+| Variable | Local value | Purpose |
+| --- | --- | --- |
+| `BETTER_AUTH_ISSUER` | `http://localhost:3000` | JWT issuer; must match `BETTER_AUTH_URL`. |
+| `BETTER_AUTH_AUDIENCE` | `http://localhost:3000` | JWT audience; Better Auth's JWT plugin defaults it to the auth app URL. |
+| `BETTER_AUTH_JWKS_URL` | `http://localhost:3000/api/auth/jwks` | Public signing keys used by Express to verify JWT signatures. |
+| `ALLOWED_ORIGIN` | `http://localhost:3000` | Browser origin allowed by Express CORS. |
+| `MONGODB_URI`, `DB_NAME` | Same as frontend | MongoDB connection for BookNook's API data. |
 
-To learn more about Next.js, take a look at the following resources:
+Authenticated frontend API calls obtain a JWT from the current Better Auth session and send it as a bearer token. Express validates the signature, expiry, issuer, and audience using the JWKS endpoint and reads the signed user identity claims. Do not copy the Better Auth session cookie or its secret into Express.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+For official configuration details, see Better Auth's [database concepts](https://www.better-auth.com/docs/concepts/database), [email/password](https://www.better-auth.com/docs/authentication/email-password), [hooks](https://www.better-auth.com/docs/concepts/hooks), [Google OAuth](https://www.better-auth.com/docs/concepts/oauth), and [JWT plugin](https://www.better-auth.com/docs/plugins/jwt).
