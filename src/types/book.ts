@@ -10,8 +10,10 @@ export interface Book {
   copies?: number;
   addedByName?: string;
   addedByEmail?: string;
-  ownerId?: string;
+  addedBy?: { name?: string; email?: string };
   addedAt?: string;
+  addedDate?: string | Date;
+  ownerId?: string;
 }
 
 export interface Borrow {

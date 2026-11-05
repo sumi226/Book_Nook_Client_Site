@@ -19,28 +19,35 @@ export default function BookActions({
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [busy, setBusy] = useState(false);
-  const [hasActiveBorrow, setHasActiveBorrow] = useState(false);
+  const [borrowedBookId, setBorrowedBookId] = useState("");
   const dialogRef = useRef<HTMLDialogElement>(null);
   const router = useRouter();
 
   const copiesCount = typeof availableCopies === "number" ? availableCopies : 0;
   const isAvailable = copiesCount > 0;
+  const hasActiveBorrow = Boolean(session) && borrowedBookId === bookId;
 
   // Check if current logged-in user already borrowed this book
   useEffect(() => {
-    if (!session) {
-      setHasActiveBorrow(false);
-      return;
-    }
+    if (!session) return;
+
     let active = true;
     listBorrows()
       .then((res) => {
         if (active) {
           const already = res.items.some((borrow) => borrow.bookId === bookId);
-          setHasActiveBorrow(already);
+          setBorrowedBookId(already ? bookId : "");
         }
       })
-      .catch(() => {});
+      .catch((issue: unknown) => {
+        if (active) {
+          toast.error(
+            issue instanceof Error
+              ? `Could not check your borrows: ${issue.message}`
+              : "Could not check your current borrows.",
+          );
+        }
+      });
 
     return () => {
       active = false;
@@ -92,7 +99,7 @@ export default function BookActions({
       const successMessage = `Borrowed successfully. Due ${dueDate}.`;
       setSuccess(successMessage);
       toast.success(successMessage);
-      setHasActiveBorrow(true);
+      setBorrowedBookId(bookId);
       dialogRef.current?.close();
       router.refresh();
     } catch (issue) {

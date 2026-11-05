@@ -47,7 +47,11 @@ export async function apiRequest<T>(
 ): Promise<T> {
   const { authenticated = false, headers: inputHeaders, ...init } = options;
   const headers = new Headers(inputHeaders);
-  if (init.body && !headers.has("content-type")) {
+  if (
+    init.body &&
+    !(typeof FormData !== "undefined" && init.body instanceof FormData) &&
+    !headers.has("content-type")
+  ) {
     headers.set("content-type", "application/json");
   }
   if (authenticated) {
@@ -82,11 +86,64 @@ export async function listBooks(page = 1, limit = 24) {
   return { items: result.books, pagination: result.pagination };
 }
 
+function unwrapBook(payload: unknown): Book | null {
+  if (!payload || typeof payload !== "object") return null;
+  const candidate =
+    "book" in payload ? (payload as { book?: unknown }).book : payload;
+  if (
+    candidate &&
+    typeof candidate === "object" &&
+    typeof (candidate as { _id?: unknown })._id === "string"
+  ) {
+    return candidate as Book;
+  }
+  return null;
+}
+
 export async function getBook(id: string) {
-  const result = await apiRequest<{ book: Book }>(
-    `/books/${encodeURIComponent(id)}`,
-  );
-  return result.book;
+  let directError: unknown;
+
+  try {
+    const payload = await apiRequest<{ book?: Book } | Book>(
+      `/books/${encodeURIComponent(id)}`,
+    );
+    const book = unwrapBook(payload);
+    if (book) return book;
+    directError = new ApiError("Book not found.", 404);
+  } catch (issue) {
+    directError = issue;
+  }
+
+  // Some API deployments do not expose the single-book endpoint (or it may be
+  // temporarily failing). Fall back to the public catalog so a book that is
+  // visible in the catalog still has a working details page.
+  try {
+    const pageSize = 100;
+    let page = 1;
+    let totalPages = 1;
+    do {
+      const result = await listBooks(page, pageSize);
+      const match = result.items.find((book) => book._id === id);
+      if (match) return match;
+      totalPages = result.pagination.totalPages;
+      page += 1;
+    } while (page <= totalPages);
+  } catch (fallbackError) {
+    if (directError instanceof ApiError) throw directError;
+    throw fallbackError;
+  }
+
+  throw new ApiError("Book not found.", 404);
+}
+
+export async function uploadBookImage(file: File) {
+  const formData = new FormData();
+  formData.set("image", file);
+  return apiRequest<{ url: string }>("/images", {
+    method: "POST",
+    authenticated: true,
+    body: formData,
+  });
 }
 
 export async function createBook(input: {

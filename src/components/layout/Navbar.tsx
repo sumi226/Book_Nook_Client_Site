@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { BookOpen, ChevronDown, LogOut, Menu, UserRound } from "lucide-react";
+import { toast } from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
 
 const publicLinks = [
@@ -16,9 +17,14 @@ export default function Navbar() {
   const router = useRouter();
 
   async function logout() {
-    await authClient.signOut();
-    router.replace("/");
-    router.refresh();
+    try {
+      await authClient.signOut();
+      toast.success("Signed out successfully.");
+      router.replace("/");
+      router.refresh();
+    } catch {
+      toast.error("Failed to sign out. Please try again.");
+    }
   }
 
   const user = session?.user;

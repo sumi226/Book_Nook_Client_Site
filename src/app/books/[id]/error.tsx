@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect } from "react";
 import { RefreshCw } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 export default function BookDetailsError({
   error,
@@ -13,6 +14,7 @@ export default function BookDetailsError({
 }) {
   useEffect(() => {
     console.error("Book details failed to load.", error);
+    toast.error("We couldn’t load this book. Check the API connection and try again.");
   }, [error]);
 
   return (

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import BookSearchGrid from "@/components/books/BookSearchGrid";
+import ToastNotice from "@/components/layout/ToastNotice";
 import { listBooks } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
@@ -23,7 +24,7 @@ export default async function AllBooksPage({
 
   return <section>
     <div className="mb-8"><p className="text-sm font-bold uppercase tracking-[.2em] text-[#A85335]">Browse the collection</p><h1 className="mt-2 font-serif text-4xl font-bold sm:text-5xl">All Books</h1><p className="mt-3 text-[#514740]">Search the live BookNook catalog by title, author, or category.</p></div>
-    {error ? <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-5 text-red-800">Could not load live books: {error}</p> : <>
+    {error ? <><ToastNotice message={`Could not load live books: ${error}`} /><p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-5 text-red-800">Could not load live books: {error}</p></> : <>
       <BookSearchGrid books={result?.items || []} />
       {result && result.pagination.totalPages > 1 && <nav aria-label="Book pages" className="mt-8 flex justify-center gap-3">
         {page > 1 && <Link className="btn btn-outline border-[#00022E]/30 text-[#00022E]" href={`/books?page=${page - 1}`}>Previous</Link>}

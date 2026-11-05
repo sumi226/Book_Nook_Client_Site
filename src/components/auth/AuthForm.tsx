@@ -45,13 +45,14 @@ export default function AuthForm({ mode, nextUrl }: { mode: "login" | "register"
         setError(message);
         toast.error(message);
       } else if (registering) {
-        toast.success("Account created. Please sign in.");
+        toast.success("Account created successfully. Please sign in.");
         const loginUrl = nextUrl && nextUrl !== "/"
           ? `/login?next=${encodeURIComponent(nextUrl)}`
           : "/login";
         router.replace(loginUrl);
         router.refresh();
       } else {
+        toast.success("Signed in successfully. Welcome back!");
         router.replace(nextUrl || "/");
         router.refresh();
       }
@@ -68,16 +69,21 @@ export default function AuthForm({ mode, nextUrl }: { mode: "login" | "register"
     setError("");
     setBusy(true);
     try {
+      toast.loading("Connecting to Google…", { id: "google-auth" });
       const result = await authClient.signIn.social({
         provider: "google",
         callbackURL: nextUrl || "/",
       });
       if (result.error) {
+        toast.dismiss("google-auth");
         const message = result.error.message || "Google sign-in failed. Please try again.";
         setError(message);
         toast.error(message);
+      } else {
+        toast.success("Redirecting to Google…", { id: "google-auth" });
       }
     } catch (issue) {
+      toast.dismiss("google-auth");
       const message = issue instanceof Error ? issue.message : "Google sign-in failed.";
       setError(message);
       toast.error(message);

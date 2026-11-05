@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, BookHeart, HandHeart } from "lucide-react";
 import HomeCarousel from "@/components/books/HomeCarousel";
 import BookGrid from "@/components/books/BookGrid";
+import ToastNotice from "@/components/layout/ToastNotice";
 import { listBooks } from "@/lib/api";
 import type { Book } from "@/types/book";
 
@@ -25,7 +26,7 @@ export default async function HomePage() {
           <h2 id="newest-heading" className="mt-2 font-serif text-3xl font-bold text-[#00022E] sm:text-4xl">New Arrivals</h2>
           <p className="mt-2 text-[#514740]">The latest stories added to our community library.</p>
         </div>
-        {loadError ? <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-5 text-red-800">Could not load live books: {loadError}</p> : <BookGrid books={books} />}
+        {loadError ? <><ToastNotice message={`Could not load live books: ${loadError}`} /><p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-5 text-red-800">Could not load live books: {loadError}</p></> : <BookGrid books={books} />}
         <div className="mt-8 text-center">
           <Link href="/books" className="btn border-0 bg-[#C87958] text-[#00022E] hover:bg-[#da9578]">
             See All Books <ArrowRight aria-hidden="true" size={17} />
