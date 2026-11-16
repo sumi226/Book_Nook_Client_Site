@@ -58,25 +58,26 @@ export default function BookActions({ book }: { book: Book }) {
   }, [userId, bookId]);
 
   useEffect(() => {
-    if (!session || !cart.isReady || borrowStatus === "checking" || autoAddHandled.current) return;
+    if (!session || !cart.isReady || autoAddHandled.current) return;
 
     const params = new URLSearchParams(window.location.search);
     if (params.get("addToCart") !== "1") return;
     autoAddHandled.current = true;
+    let destination = `/books/${encodeURIComponent(bookId)}`;
 
     if (hasActiveBorrow) {
       toast.error("You already have this book borrowed.");
-    } else if (borrowStatus === "error") {
-      toast.error("Could not verify your borrows, so this book was not added.");
     } else {
       const result = cart.addItem(book);
-      if (result === "added") toast.success(`“${book.title}” added to your cart.`);
-      else if (result === "unavailable") toast.error("This book is not available.");
+      if (result === "added") {
+        toast.success(`“${book.title}” added to your cart.`);
+        destination = "/books";
+      } else if (result === "unavailable") toast.error("This book is not available.");
       else if (result === "duplicate") toast("This book is already in your cart.");
       else toast.error("Could not add this book to your cart. Please try again.");
     }
 
-    router.replace(`/books/${encodeURIComponent(bookId)}`, { scroll: false });
+    router.replace(destination, { scroll: false });
   }, [session, cart, borrowStatus, hasActiveBorrow, book, bookId, router]);
 
   function addToCart() {
@@ -91,14 +92,11 @@ export default function BookActions({ book }: { book: Book }) {
       toast.error("You already have this book borrowed.");
       return;
     }
-    if (borrowStatus === "error") {
-      toast.error("Could not verify your borrows. Please reload and try again.");
-      return;
-    }
-
     const result = cart.addItem(book);
-    if (result === "added") toast.success(`“${book.title}” added to your cart.`);
-    else if (result === "unavailable") toast.error("This book is not available.");
+    if (result === "added") {
+      toast.success(`“${book.title}” added to your cart.`);
+      router.push("/books");
+    } else if (result === "unavailable") toast.error("This book is not available.");
     else if (result === "duplicate") toast("This book is already in your cart.");
     else if (result === "loading") toast("Your cart is still loading. Please try again.");
     else toast.error("Please sign in to add this book.");
@@ -109,8 +107,7 @@ export default function BookActions({ book }: { book: Book }) {
     !isAvailable ||
     isInCart ||
     hasActiveBorrow ||
-    borrowStatus === "error" ||
-    (Boolean(session) && (!cart.isReady || borrowStatus === "checking"));
+    (Boolean(session) && !cart.isReady);
 
   return (
     <div className="mt-7 space-y-4">
@@ -127,7 +124,7 @@ export default function BookActions({ book }: { book: Book }) {
       )}
       {borrowStatus === "error" && session && (
         <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-800">
-          Could not verify your current borrows. Reload the page to try again.
+          Could not verify your current borrows. The server will check again when you confirm from the cart.
         </p>
       )}
       <button
@@ -146,7 +143,7 @@ export default function BookActions({ book }: { book: Book }) {
           ? "Already Borrowed"
           : isInCart
           ? "In Cart"
-          : isPending || (session && borrowStatus === "checking")
+          : isPending || (session && !cart.isReady)
           ? "Checking availability…"
           : session
           ? "Add to Cart"

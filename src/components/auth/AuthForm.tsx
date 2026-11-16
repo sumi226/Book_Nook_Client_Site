@@ -12,6 +12,7 @@ export default function AuthForm({ mode, nextUrl }: { mode: "login" | "register"
   const [busy, setBusy] = useState(false);
   const router = useRouter();
   const registering = mode === "register";
+  const loginDestination = nextUrl && nextUrl !== "/" ? nextUrl : "/books";
   const alternateHref = `${registering ? "/login" : "/register"}${nextUrl && nextUrl !== "/" ? `?next=${encodeURIComponent(nextUrl)}` : ""}`;
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -39,7 +40,7 @@ export default function AuthForm({ mode, nextUrl }: { mode: "login" | "register"
             password,
             image: String(formData.get("image") || "").trim() || undefined,
           })
-        : await authClient.signIn.email({ email, password, callbackURL: nextUrl || "/" });
+        : await authClient.signIn.email({ email, password, callbackURL: loginDestination });
       if (result.error) {
         const message = result.error.message || "Authentication failed. Please try again.";
         setError(message);
@@ -53,7 +54,7 @@ export default function AuthForm({ mode, nextUrl }: { mode: "login" | "register"
         router.refresh();
       } else {
         toast.success("Signed in successfully. Welcome back!");
-        router.replace(nextUrl || "/");
+        router.replace(loginDestination);
         router.refresh();
       }
     } catch (issue) {
@@ -72,7 +73,7 @@ export default function AuthForm({ mode, nextUrl }: { mode: "login" | "register"
       toast.loading("Connecting to Google…", { id: "google-auth" });
       const result = await authClient.signIn.social({
         provider: "google",
-        callbackURL: nextUrl || "/",
+        callbackURL: loginDestination,
       });
       if (result.error) {
         toast.dismiss("google-auth");
