@@ -15,7 +15,7 @@ const publicLinks = [
 
 export default function Navbar() {
   const { data: session, isPending } = authClient.useSession();
-  const { items: cartItems } = useCart();
+  const { items: cartItems, userId: cartUserId, isReady: cartReady } = useCart();
   const router = useRouter();
 
   async function logout() {
@@ -30,6 +30,9 @@ export default function Navbar() {
   }
 
   const user = session?.user;
+  const cartCount = user
+    ? (cartReady && cartUserId === user.id ? cartItems.length : "…")
+    : 0;
   const privateLinks = [
     { href: "/add-book", label: "Add Book" },
     { href: "/my-books", label: "My Books" },
@@ -46,7 +49,7 @@ export default function Navbar() {
             </button>
             <ul className="menu dropdown-content z-20 mt-3 w-56 rounded-2xl bg-[#00022E] p-3 text-white shadow-xl lg:hidden">
               {publicLinks.map((item) => <li key={item.href}><Link href={item.href}>{item.label}</Link></li>)}
-              <li><Link href="/cart"><ShoppingCart size={16} />Add to Cart ({cartItems.length})</Link></li>
+              <li><Link href="/cart"><ShoppingCart size={16} />Add to Cart ({cartCount})</Link></li>
               {user && privateLinks.map((item) => <li key={item.href}><Link href={item.href}>{item.label}</Link></li>)}
               {user && <li><Link href="/my-profile">My Profile</Link></li>}
               {!user && !isPending && <><li><Link href="/login"><LogIn size={16} />Sign in</Link></li><li><Link href="/register"><UserPlus size={16} />Sign up</Link></li></>}
@@ -67,11 +70,11 @@ export default function Navbar() {
           <Link
             href="/cart"
             className="btn btn-ghost btn-sm gap-1 px-2 text-white"
-            aria-label={`Add to Cart, ${cartItems.length} books`}
+            aria-label={`Add to Cart, ${cartCount} books`}
           >
             <ShoppingCart size={18} />
             <span className="hidden sm:inline">Add to Cart</span>
-            <span className="badge badge-sm border-0 bg-[#C87958] text-[#00022E]">{cartItems.length}</span>
+            <span className="badge badge-sm border-0 bg-[#C87958] text-[#00022E]">{cartCount}</span>
           </Link>
           {!isPending && !user && <>
             <Link href="/login" className="btn btn-ghost btn-sm gap-1 px-2 text-white"><LogIn size={16} /><span className="hidden sm:inline">Sign in</span></Link>

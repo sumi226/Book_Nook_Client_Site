@@ -18,6 +18,7 @@ export type CartBook = Pick<
 
 type CartContextValue = {
   items: CartBook[];
+  userId: string | null;
   isReady: boolean;
   isAuthenticated: boolean;
   addItem: (book: Book) => AddItemResult;
@@ -129,6 +130,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const visibleItems = userId && cartState.userId === userId ? cartState.items : [];
   const value: CartContextValue = {
     items: visibleItems,
+    userId: userId || null,
     isReady: isPending ? false : !userId || (cartState.userId === userId && cartState.ready),
     isAuthenticated: Boolean(userId),
     addItem,

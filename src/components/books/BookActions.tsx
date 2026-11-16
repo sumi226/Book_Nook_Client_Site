@@ -23,6 +23,9 @@ export default function BookActions({ book }: { book: Book }) {
   const bookId = book._id;
   const isAvailable = book.availableCopies > 0;
   const isInCart = cart.items.some((item) => item._id === bookId);
+  const cartReadyForUser = Boolean(
+    userId && cart.userId === userId && cart.isReady,
+  );
   const borrowStatus = userId
     ? (borrowState.userId === userId ? borrowState.status : "checking")
     : "clear";
@@ -58,7 +61,7 @@ export default function BookActions({ book }: { book: Book }) {
   }, [userId, bookId]);
 
   useEffect(() => {
-    if (!session || !cart.isReady || autoAddHandled.current) return;
+    if (!session || !cartReadyForUser || autoAddHandled.current) return;
 
     const params = new URLSearchParams(window.location.search);
     if (params.get("addToCart") !== "1") return;
@@ -71,14 +74,14 @@ export default function BookActions({ book }: { book: Book }) {
       const result = cart.addItem(book);
       if (result === "added") {
         toast.success(`“${book.title}” added to your cart.`);
-        destination = "/books";
+        destination = "/cart";
       } else if (result === "unavailable") toast.error("This book is not available.");
       else if (result === "duplicate") toast("This book is already in your cart.");
       else toast.error("Could not add this book to your cart. Please try again.");
     }
 
     router.replace(destination, { scroll: false });
-  }, [session, cart, borrowStatus, hasActiveBorrow, book, bookId, router]);
+  }, [session, cart, cartReadyForUser, borrowStatus, hasActiveBorrow, book, bookId, router]);
 
   function addToCart() {
     if (!session) {
@@ -92,10 +95,15 @@ export default function BookActions({ book }: { book: Book }) {
       toast.error("You already have this book borrowed.");
       return;
     }
+    if (!cartReadyForUser) {
+      toast("Your cart is syncing with your account. Please try again.");
+      return;
+    }
+
     const result = cart.addItem(book);
     if (result === "added") {
       toast.success(`“${book.title}” added to your cart.`);
-      router.push("/books");
+      router.push("/cart");
     } else if (result === "unavailable") toast.error("This book is not available.");
     else if (result === "duplicate") toast("This book is already in your cart.");
     else if (result === "loading") toast("Your cart is still loading. Please try again.");
@@ -107,7 +115,7 @@ export default function BookActions({ book }: { book: Book }) {
     !isAvailable ||
     isInCart ||
     hasActiveBorrow ||
-    (Boolean(session) && !cart.isReady);
+    (Boolean(session) && !cartReadyForUser);
 
   return (
     <div className="mt-7 space-y-4">
@@ -143,8 +151,8 @@ export default function BookActions({ book }: { book: Book }) {
           ? "Already Borrowed"
           : isInCart
           ? "In Cart"
-          : isPending || (session && !cart.isReady)
-          ? "Checking availability…"
+          : isPending || (session && !cartReadyForUser)
+          ? "Syncing your cart…"
           : session
           ? "Add to Cart"
           : "Sign in to borrow"}

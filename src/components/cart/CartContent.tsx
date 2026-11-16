@@ -28,6 +28,9 @@ export default function CartContent() {
   const [checkoutError, setCheckoutError] = useState("");
   const isBorrowStateCurrent =
     Boolean(userId) && borrowState.userId === userId && borrowState.requestKey === reloadKey;
+  const cartMatchesSession = session
+    ? cart.userId === userId
+    : cart.userId === null;
   const borrowStatus = !userId
     ? "idle"
     : isBorrowStateCurrent
@@ -122,7 +125,7 @@ export default function CartContent() {
     setBusy(false);
   }
 
-  if (isPending || (session && (!cart.isReady || borrowStatus === "loading"))) {
+  if (isPending || !cartMatchesSession || (session && !cart.isReady)) {
     return <p role="status" className="flex items-center gap-3"><LoaderCircle className="animate-spin" />Loading your cart…</p>;
   }
 
@@ -134,23 +137,6 @@ export default function CartContent() {
         <Link href="/login?next=%2Fcart" className="btn mt-5 border-0 bg-[#C87958] text-[#00022E] hover:bg-[#da9578]">
           Sign in
         </Link>
-      </div>
-    );
-  }
-
-  if (borrowStatus === "error") {
-    return (
-      <div role="alert" className="rounded-2xl border border-red-200 bg-white p-7 text-red-800">
-        <p>Could not verify your current borrows: {borrowState.error}</p>
-        <button
-          type="button"
-          className="btn btn-sm mt-4"
-          onClick={() => {
-            setReloadKey((key) => key + 1);
-          }}
-        >
-          Try again
-        </button>
       </div>
     );
   }
@@ -213,6 +199,21 @@ export default function CartContent() {
         <p className="mt-2 text-sm text-slate-600">
           Each title can only be borrowed once at a time. Unavailable or already borrowed books will stay in your cart.
         </p>
+        {borrowStatus === "loading" && (
+          <p role="status" className="mt-4 text-sm text-slate-600">Checking your current borrows…</p>
+        )}
+        {borrowStatus === "error" && (
+          <div role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-800">
+            <p>Could not verify your current borrows: {borrowState.error}</p>
+            <button
+              type="button"
+              className="btn btn-sm mt-3"
+              onClick={() => setReloadKey((key) => key + 1)}
+            >
+              Try again
+            </button>
+          </div>
+        )}
         <label className="mt-5 flex items-center justify-between gap-3 text-sm font-semibold">
           Borrow period
           <select
@@ -227,10 +228,16 @@ export default function CartContent() {
         <button
           type="button"
           className="btn mt-5 w-full border-0 bg-[#C87958] text-[#00022E] hover:bg-[#da9578]"
-          disabled={busy || borrowableCount === 0}
+          disabled={busy || borrowStatus !== "ready" || borrowableCount === 0}
           onClick={() => void borrowCart()}
         >
-          {busy ? "Borrowing…" : `Borrow ${borrowableCount} book${borrowableCount === 1 ? "" : "s"}`}
+          {busy
+            ? "Borrowing…"
+            : borrowStatus === "loading"
+            ? "Checking borrows…"
+            : borrowStatus === "error"
+            ? "Retry borrow check above"
+            : `Borrow ${borrowableCount} book${borrowableCount === 1 ? "" : "s"}`}
         </button>
         <Link href="/books" className="mt-4 block text-center text-sm font-semibold text-[#A85335] hover:underline">
           Continue browsing

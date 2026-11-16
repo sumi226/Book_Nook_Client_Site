@@ -60,7 +60,7 @@ export default function HomeCarousel() {
                 <p className="mb-5 text-xs font-bold uppercase tracking-[.24em] text-[#efb39c]">{slide.eyebrow}</p>
                 <h1 className="font-serif text-4xl font-semibold leading-tight sm:text-6xl">{slide.title}</h1>
                 <p className="mt-5 max-w-lg text-base leading-7 text-white/85">{slide.note}</p>
-                <Link href="/books" className="btn mt-8 border-0 bg-[#C87958] text-[#00022E] hover:bg-[#da9578]">
+                <Link href="/#newest-heading" className="btn mt-8 border-0 bg-[#C87958] text-[#00022E] hover:bg-[#da9578]">
                   Browse Books <ArrowRight aria-hidden="true" size={17} />
                 </Link>
               </div>

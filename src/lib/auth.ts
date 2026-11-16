@@ -62,6 +62,10 @@ export function createAuth() {
       minPasswordLength: 6,
       autoSignIn: false,
     },
+    session: {
+      expiresIn: 60 * 60 * 24 * 365,
+      updateAge: 60 * 60 * 24,
+    },
     socialProviders: googleClientId && googleClientSecret
       ? {
           google: {
@@ -84,6 +88,10 @@ export function createAuth() {
         }
       }),
     },
-    plugins: [jwt()],
+    // The JWKS private key is stored unencrypted so it can be read by every
+    // environment that shares this database (local + deployed). With encryption
+    // enabled a BETTER_AUTH_SECRET mismatch makes /api/auth/token fail with
+    // "Failed to decrypt private key", which breaks all authenticated API calls.
+    plugins: [jwt({ jwks: { disablePrivateKeyEncryption: true } })],
   });
 }

@@ -12,7 +12,7 @@ export default async function HomePage() {
       <section aria-labelledby="newest-heading">
         <div className="mb-7">
           <p className="text-sm font-bold uppercase tracking-[.2em] text-[#A85335]">Fresh on the shelves</p>
-          <h2 id="newest-heading" className="mt-2 font-serif text-3xl font-bold text-[#00022E] sm:text-4xl">New Arrivals</h2>
+          <h2 id="newest-heading" className="mt-2 scroll-mt-24 font-serif text-3xl font-bold text-[#00022E] sm:text-4xl">New Arrivals</h2>
           <p className="mt-2 text-[#514740]">The latest stories added to our community library.</p>
         </div>
         <HomeBookCards />
