@@ -4,6 +4,10 @@ import { ArrowUpRight, BookOpen } from "lucide-react";
 import type { Book } from "@/types/book";
 
 export default function BookCard({ book }: { book: Book }) {
+  const availableCopies = typeof book.availableCopies === "number"
+    ? book.availableCopies
+    : (book.copies ?? 0);
+
   return (
     <article className="overflow-hidden rounded-2xl border border-white/10 bg-white text-slate-900 shadow-xl shadow-black/15">
       <Link
@@ -24,6 +28,11 @@ export default function BookCard({ book }: { book: Book }) {
           <span className="absolute left-3 top-3 rounded-full bg-[#00022E]/90 px-3 py-1 text-xs font-semibold text-white">
             {book.category}
           </span>
+          {availableCopies <= 0 && (
+            <span className="absolute right-3 top-3 rounded-full bg-red-700 px-3 py-1 text-xs font-semibold text-white">
+              Unavailable
+            </span>
+          )}
         </div>
         <div className="p-5">
           <h3 className="line-clamp-1 font-serif text-xl font-bold">{book.title}</h3>
@@ -35,7 +44,9 @@ export default function BookCard({ book }: { book: Book }) {
       </Link>
       <p className="flex items-center gap-2 border-t border-slate-200 px-5 py-3 text-xs text-slate-600">
         <BookOpen aria-hidden="true" size={14} />
-        {book.availableCopies} of {book.totalCopies} copies available
+        {availableCopies > 0
+          ? `${availableCopies} of ${book.totalCopies} copies available`
+          : "Unavailable"}
       </p>
     </article>
   );

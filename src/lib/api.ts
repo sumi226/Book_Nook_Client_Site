@@ -1,11 +1,16 @@
 import type { Book, Borrow, PageResult } from "@/types/book";
 
-function selectEnvironmentUrl(value: string | undefined, fallback: string) {
-  const candidates = (value || "")
+function getEnvironmentUrls(value: string | undefined) {
+  return (value || "")
     .split(",")
     .map((url) => url.trim().replace(/\/+$/, ""))
     .filter(Boolean);
-  const isLocalUrl = (url: string) => /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(url);
+}
+
+const isLocalUrl = (url: string) => /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(url);
+
+function selectEnvironmentUrl(value: string | undefined, fallback: string) {
+  const candidates = getEnvironmentUrls(value);
   const preferred = process.env.NODE_ENV === "production"
     ? candidates.find((url) => !isLocalUrl(url))
     : candidates.find(isLocalUrl);
@@ -13,11 +18,15 @@ function selectEnvironmentUrl(value: string | undefined, fallback: string) {
   return preferred || fallback;
 }
 
+const configuredApiUrls = getEnvironmentUrls(process.env.NEXT_PUBLIC_API_URL);
 const API_URL = selectEnvironmentUrl(
   process.env.NEXT_PUBLIC_API_URL,
   process.env.NODE_ENV === "production"
     ? "https://booknookserversite.vercel.app"
     : "http://localhost:8000",
+);
+const publicApiFallbackUrls = configuredApiUrls.filter(
+  (url) => url !== API_URL && (process.env.NODE_ENV !== "production" || !isLocalUrl(url)),
 );
 
 type ApiOptions = RequestInit & { authenticated?: boolean };
@@ -47,7 +56,8 @@ async function getAccessToken() {
   return token;
 }
 
-export async function apiRequest<T>(
+async function apiRequestAt<T>(
+  baseUrl: string,
   path: string,
   options: ApiOptions = {},
 ): Promise<T> {
@@ -64,7 +74,7 @@ export async function apiRequest<T>(
     headers.set("authorization", "Bearer " + (await getAccessToken()));
   }
 
-  const response = await fetch(`${API_URL}${path}`, {
+  const response = await fetch(`${baseUrl}${path}`, {
     ...init,
     headers,
     cache: "no-store",
@@ -84,12 +94,32 @@ export async function apiRequest<T>(
   return payload as T;
 }
 
+export async function apiRequest<T>(
+  path: string,
+  options: ApiOptions = {},
+): Promise<T> {
+  return apiRequestAt<T>(API_URL, path, options);
+}
+
 export async function listBooks(page = 1, limit = 24) {
-  const result = await apiRequest<{
-    books: Book[];
-    pagination: PageResult<Book>["pagination"];
-  }>(`/books?page=${page}&limit=${limit}`);
-  return { items: result.books, pagination: result.pagination };
+  const path = `/books?page=${page}&limit=${limit}`;
+  const urls = [API_URL, ...publicApiFallbackUrls];
+
+  for (let index = 0; index < urls.length; index += 1) {
+    try {
+      const result = await apiRequestAt<{
+        books: Book[];
+        pagination: PageResult<Book>["pagination"];
+      }>(urls[index], path);
+      return { items: result.books, pagination: result.pagination };
+    } catch (issue) {
+      if (!(issue instanceof TypeError) || index === urls.length - 1) {
+        throw issue;
+      }
+    }
+  }
+
+  throw new Error("The library could not be reached.");
 }
 
 function unwrapBook(payload: unknown): Book | null {

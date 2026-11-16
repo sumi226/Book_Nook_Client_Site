@@ -3,9 +3,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { BookOpen, ChevronDown, LogOut, Menu, UserRound } from "lucide-react";
+import { ChevronDown, LogIn, LogOut, Menu, ShoppingCart, UserPlus, UserRound } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
+import { useCart } from "@/components/cart/CartProvider";
 
 const publicLinks = [
   { href: "/", label: "Home" },
@@ -14,6 +15,7 @@ const publicLinks = [
 
 export default function Navbar() {
   const { data: session, isPending } = authClient.useSession();
+  const { items: cartItems } = useCart();
   const router = useRouter();
 
   async function logout() {
@@ -44,13 +46,14 @@ export default function Navbar() {
             </button>
             <ul className="menu dropdown-content z-20 mt-3 w-56 rounded-2xl bg-[#00022E] p-3 text-white shadow-xl lg:hidden">
               {publicLinks.map((item) => <li key={item.href}><Link href={item.href}>{item.label}</Link></li>)}
+              <li><Link href="/cart"><ShoppingCart size={16} />Add to Cart ({cartItems.length})</Link></li>
               {user && privateLinks.map((item) => <li key={item.href}><Link href={item.href}>{item.label}</Link></li>)}
               {user && <li><Link href="/my-profile">My Profile</Link></li>}
-              {!user && !isPending && <><li><Link href="/login">Login</Link></li><li><Link href="/register">Register</Link></li></>}
+              {!user && !isPending && <><li><Link href="/login"><LogIn size={16} />Sign in</Link></li><li><Link href="/register"><UserPlus size={16} />Sign up</Link></li></>}
             </ul>
           </div>
           <Link href="/" className="flex items-center gap-2 rounded-lg font-serif text-2xl font-bold tracking-tight" aria-label="BookNook home">
-            <span className="grid size-10 place-items-center rounded-xl bg-[#C87958] text-[#00022E]"><BookOpen size={22} /></span>
+            <Image src="/assets/logo.png" alt="" width={40} height={40} className="size-10 rounded-xl object-contain" />
             BookNook
           </Link>
         </div>
@@ -61,9 +64,18 @@ export default function Navbar() {
           </ul>
         </nav>
         <div className="navbar-end gap-2">
+          <Link
+            href="/cart"
+            className="btn btn-ghost btn-sm gap-1 px-2 text-white"
+            aria-label={`Add to Cart, ${cartItems.length} books`}
+          >
+            <ShoppingCart size={18} />
+            <span className="hidden sm:inline">Add to Cart</span>
+            <span className="badge badge-sm border-0 bg-[#C87958] text-[#00022E]">{cartItems.length}</span>
+          </Link>
           {!isPending && !user && <>
-            <Link href="/login" className="btn btn-ghost btn-sm text-white">Login</Link>
-            <Link href="/register" className="btn btn-sm border-0 bg-[#C87958] text-[#00022E] hover:bg-[#da9578]">Register</Link>
+            <Link href="/login" className="btn btn-ghost btn-sm gap-1 px-2 text-white"><LogIn size={16} /><span className="hidden sm:inline">Sign in</span></Link>
+            <Link href="/register" className="btn btn-sm gap-1 border-0 bg-[#C87958] px-2 text-[#00022E] hover:bg-[#da9578]"><UserPlus size={16} /><span>Sign up</span></Link>
           </>}
           {user && <div className="dropdown dropdown-end">
             <button type="button" className="btn btn-ghost gap-2 rounded-full text-white" aria-label="Open account menu">

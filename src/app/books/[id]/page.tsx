@@ -48,7 +48,7 @@ export default async function BookDetailsPage({ params }: { params: Promise<{ id
           {addedBy && <div className="flex items-center gap-2"><UserRound size={16} aria-hidden="true" /><dt className="font-semibold text-slate-800">Shared by</dt><dd>{addedBy}</dd></div>}
           {addedDateLabel && <div className="flex items-center gap-2"><CalendarDays size={16} aria-hidden="true" /><dt className="font-semibold text-slate-800">Added</dt><dd><time dateTime={addedAt!.toISOString()}>{addedDateLabel}</time></dd></div>}
         </dl>}
-        <BookActions bookId={book._id} availableCopies={available} />
+        <BookActions book={{ ...book, availableCopies: available }} />
       </div>
     </div>
   </article>;
